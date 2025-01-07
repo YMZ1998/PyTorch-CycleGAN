@@ -3,6 +3,7 @@ import time
 import datetime
 import sys
 
+from torch import nn
 from torch.autograd import Variable
 import torch
 from visdom import Visdom
@@ -108,11 +109,21 @@ class LambdaLR():
     def step(self, epoch):
         return 1.0 - max(0, epoch + self.offset - self.decay_start_epoch)/(self.n_epochs - self.decay_start_epoch)
 
+# def weights_init_normal(m):
+#     classname = m.__class__.__name__
+#     if classname.find('Conv') != -1:
+#         torch.nn.init.normal(m.weight.data, 0.0, 0.02)
+#     elif classname.find('BatchNorm2d') != -1:
+#         torch.nn.init.normal(m.weight.data, 1.0, 0.02)
+#         torch.nn.init.constant(m.bias.data, 0.0)
+
 def weights_init_normal(m):
     classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
-        torch.nn.init.normal(m.weight.data, 0.0, 0.02)
-    elif classname.find('BatchNorm2d') != -1:
-        torch.nn.init.normal(m.weight.data, 1.0, 0.02)
-        torch.nn.init.constant(m.bias.data, 0.0)
+    if isinstance(m, nn.Conv2d):  # 使用 isinstance 更简洁且稳健
+        torch.nn.init.normal_(m.weight.data, 0.0, 0.02)  # 用原地操作
+        if m.bias is not None:
+            torch.nn.init.constant_(m.bias.data, 0.0)  # 假设存在 bias
+    elif isinstance(m, nn.BatchNorm2d):
+        torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
+        torch.nn.init.constant_(m.bias.data, 0.0)  # 假设存在 bias
 

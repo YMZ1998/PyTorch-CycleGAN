@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+.idea/
 # Distribution / packaging
 .Python
 env/
@@ -101,7 +102,7 @@ ENV/
 .mypy_cache/
 
 # project directories
-datasets/
+#datasets/
 output/A/
 output/B/
 
