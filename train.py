@@ -25,15 +25,15 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=1, help='starting epoch')
     parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs of training')
     parser.add_argument('--batchSize', type=int, default=1, help='size of the batches')
-    parser.add_argument('--dataroot', type=str, default='datasets/horse2zebra/', help='root directory of the dataset')
+    parser.add_argument('--dataroot', type=str, default='datasets/cbct2ct/', help='root directory of the dataset')
     parser.add_argument('--lr', type=float, default=0.0002, help='initial learning rate')
-    parser.add_argument('--decay_epoch', type=int, default=100,
-                        help='epoch to start linearly decaying the learning rate to 0')
+    parser.add_argument('--decay_epoch', type=int, default=100, help='epoch to start linearly decaying the learning rate to 0')
     parser.add_argument('--size', type=int, default=256, help='size of the data crop (squared assumed)')
-    parser.add_argument('--input_nc', type=int, default=3, help='number of channels of input data')
-    parser.add_argument('--output_nc', type=int, default=3, help='number of channels of output data')
+    parser.add_argument('--input_nc', type=int, default=1, help='number of channels of input data')
+    parser.add_argument('--output_nc', type=int, default=1, help='number of channels of output data')
     parser.add_argument('--cuda', action='store_true', default=True, help='use GPU computation')
     parser.add_argument('--n_cpu', type=int, default=8, help='number of cpu threads to use during batch generation')
+    parser.add_argument('--resume', action='store_true', default=False, help='resume from previous checkpoint')
     opt = parser.parse_args()
     print(opt)
 
@@ -57,6 +57,13 @@ if __name__ == '__main__':
     netG_B2A.apply(weights_init_normal)
     netD_A.apply(weights_init_normal)
     netD_B.apply(weights_init_normal)
+
+    if opt.resume:
+        # Load state dicts
+        netG_A2B.load_state_dict(torch.load('output/netG_A2B.pth'))
+        netG_B2A.load_state_dict(torch.load('output/netG_B2A.pth'))
+        netD_A.load_state_dict(torch.load('output/netD_A.pth'))
+        netD_B.load_state_dict(torch.load('output/netD_B.pth'))
 
     # Lossess
     criterion_GAN = torch.nn.MSELoss()
